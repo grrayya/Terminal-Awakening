@@ -21,6 +21,9 @@ Player init_player() {
 }
 
 int main() {
+    // Initialize the player
+    Player player1 = init_player();
+
     printf("========================================\n");
     printf("[SYSTEM] INITIALIZATION COMPLETE.\n");
     printf("[SYSTEM] WELCOME, PLAYER.\n");
@@ -30,10 +33,6 @@ int main() {
     printf("A glowing blue interface hovers in the air in front of you.\n");
 
     // The Game Loop
-    // Initialize the player
-    Player player1 = init_player();
-    // The Game Loop
-    int door_locked = 1;
     int door_locked = 1; // 1 means locked, 0 means unlocked
     int playing = 1;
     char command[50]; // Variable to store what the player types
@@ -52,32 +51,38 @@ int main() {
             printf("\nThe room is made of cold, bare metal.\n");
             printf("There is a heavy steel door to the north.\n");
         }
-        // Check for search
+        // 3. Check for search
         else if (strcmp(command, "search") == 0) {
             printf("\nYou drop to your knees and feel along the cold floor.\n");
             printf("Your hand brushes against a small plastic rectangle.\n");
             printf("[SYSTEM] YOU FOUND: SECURITY KEYCARD.\n");
             player1.has_keycard = 1; // Give the player the item!
         }
-        // 3. Check for open
+        // 4. Check for open
         else if (strcmp(command, "open") == 0) {
             printf("\nWhat do you want to open?\n> ");
             scanf("%49s", command); // Read the second word
 
             if (strcmp(command, "door") == 0) {
                 if (door_locked == 1) {
-                    printf("\nYou push against the heavy steel door. It's locked tight.\n");
-                    printf("[SYSTEM] A KEYCARD IS REQUIRED.\n");
+                    if (player1.has_keycard == 1) {
+                        printf("\nYou swipe the keycard. A green light flashes. *BEEP*\n");
+                        printf("The heavy steel door grinds open, revealing a dark hallway.\n");
+                        door_locked = 0; // The door is now unlocked!
+                    } else {
+                        printf("\nYou push against the heavy steel door. It's locked tight.\n");
+                        printf("[SYSTEM] A KEYCARD IS REQUIRED.\n");
+                    }
                 } else {
-                    printf("\nThe steel door grinds open, revealing a dark hallway.\n");
+                    printf("\nThe door is already open. A dark hallway waits ahead.\n");
                 }
             } else {
                 printf("\nYou can't open that.\n");
             }
         }
-        // 4. Handle unrecognized commands
+        // 5. Handle unrecognized commands
         else {
-            printf("\n[SYSTEM ERROR] Command not recognized. Try 'look', 'open', or 'quit'.\n");
+            printf("\n[SYSTEM ERROR] Command not recognized. Try 'look', 'search', 'open', or 'quit'.\n");
         }
     }
 
