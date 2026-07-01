@@ -7,14 +7,16 @@ typedef struct {
     char name[50];
     int hp;
     int level;
+    int has_keycard; // 1 means they have it, 0 means they don't
 } Player;
 
 // Initialize player with default stats
 Player init_player() {
     Player p;
-    strcpy(p.name, "Unknown");  // Great fix here!
+    strcpy(p.name, "Unknown");
     p.hp = 100;
     p.level = 1;
+    p.has_keycard = 0; // Player starts with no keycard
     return p;
 }
 
