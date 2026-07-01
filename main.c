@@ -12,7 +12,7 @@ typedef struct {
 // Initialize player with default stats
 Player init_player() {
     Player p;
-    strcpy(p.name, "Unknown");  // Fixed: name field was never initialized
+    strcpy(p.name, "Unknown");  // Great fix here!
     p.hp = 100;
     p.level = 1;
     return p;
@@ -36,26 +36,35 @@ int main() {
         printf("\nWhat do you want to do?\n> ");
         scanf("%49s", command); // Reads up to 49 characters
 
+        // 1. Check for quit
         if (strcmp(command, "quit") == 0) {
             printf("\n[SYSTEM] SHUTTING DOWN...\n");
             playing = 0; // This breaks the loop
         }
+        // 2. Check for look
         else if (strcmp(command, "look") == 0) {
             printf("\nThe room is made of cold, bare metal.\n");
             printf("There is a heavy steel door to the north.\n");
-        }                                           // Fixed: was missing this closing brace
+        }
+        // 3. Check for open
         else if (strcmp(command, "open") == 0) {
             printf("\nWhat do you want to open?\n> ");
-            scanf("%49s", command);
+            scanf("%49s", command); // Read the second word
 
             if (strcmp(command, "door") == 0) {
-                printf("\nYou push against the heavy steel door. It's locked tight.\n");
+                if (door_locked == 1) {
+                    printf("\nYou push against the heavy steel door. It's locked tight.\n");
+                    printf("[SYSTEM] A KEYCARD IS REQUIRED.\n");
+                } else {
+                    printf("\nThe steel door grinds open, revealing a dark hallway.\n");
+                }
             } else {
                 printf("\nYou can't open that.\n");
             }
         }
+        // 4. Handle unrecognized commands
         else {
-            printf("\n[SYSTEM ERROR] Command not recognized. Try 'look' or 'quit'.\n");
+            printf("\n[SYSTEM ERROR] Command not recognized. Try 'look', 'open', or 'quit'.\n");
         }
     }
 
