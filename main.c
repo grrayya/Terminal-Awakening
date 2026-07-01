@@ -30,6 +30,10 @@ int main() {
     printf("A glowing blue interface hovers in the air in front of you.\n");
 
     // The Game Loop
+    // Initialize the player
+    Player player1 = init_player();
+    // The Game Loop
+    int door_locked = 1;
     int door_locked = 1; // 1 means locked, 0 means unlocked
     int playing = 1;
     char command[50]; // Variable to store what the player types
@@ -47,6 +51,13 @@ int main() {
         else if (strcmp(command, "look") == 0) {
             printf("\nThe room is made of cold, bare metal.\n");
             printf("There is a heavy steel door to the north.\n");
+        }
+        // Check for search
+        else if (strcmp(command, "search") == 0) {
+            printf("\nYou drop to your knees and feel along the cold floor.\n");
+            printf("Your hand brushes against a small plastic rectangle.\n");
+            printf("[SYSTEM] YOU FOUND: SECURITY KEYCARD.\n");
+            player1.has_keycard = 1; // Give the player the item!
         }
         // 3. Check for open
         else if (strcmp(command, "open") == 0) {
