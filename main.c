@@ -28,6 +28,7 @@ int main() {
     printf("A glowing blue interface hovers in the air in front of you.\n");
 
     // The Game Loop
+    int door_locked = 1; // 1 means locked, 0 means unlocked
     int playing = 1;
     char command[50]; // Variable to store what the player types
 
