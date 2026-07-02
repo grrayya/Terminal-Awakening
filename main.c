@@ -8,6 +8,7 @@ typedef struct {
     int hp;
     int level;
     int has_keycard; // 1 means they have it, 0 means they don't
+    int potions;     // Track number of healing potions
 } Player;
 
 // Define the Enemy struct
@@ -24,6 +25,7 @@ Player init_player() {
     p.hp = 100;
     p.level = 1;
     p.has_keycard = 0; // Player starts with no keycard
+    p.potions = 1;     // Start with 1 health potion
     return p;
 }
 
@@ -129,9 +131,11 @@ int main() {
         // 6. Check inventory
         else if (strcmp(command, "inventory") == 0 || strcmp(command, "items") == 0) {
             printf("\n--- %s's INVENTORY ---\n", player1.name);
+            printf("[P] HEALING POTIONS: %d\n", player1.potions);
             if (player1.has_keycard == 1) {
                 printf("[ ] SECURITY KEYCARD\n");
-            } else {
+            }
+            if (player1.potions == 0 && player1.has_keycard == 0) {
                 printf("(Your inventory is empty)\n");
             }
             printf("-----------------------\n");
@@ -181,10 +185,35 @@ int main() {
                 printf("\nThere is nothing to attack here.\n");
             }
         }
-        // 9. Handle unrecognized commands
+        // 9. Check for item usage
+        else if (strcmp(command, "use") == 0) {
+            printf("\nWhat do you want to use?\n> ");
+            scanf("%49s", command);
+
+            if (strcmp(command, "potion") == 0) {
+                if (player1.potions > 0) {
+                    if (player1.hp >= 100) {
+                        printf("\nYour health is already full!\n");
+                    } else {
+                        player1.hp += 40;
+                        if (player1.hp > 100) {
+                            player1.hp = 100; // Cap health at max
+                        }
+                        player1.potions--; // Use up the potion
+                        printf("\nYou drink the glowing red liquid. You feel a surge of energy!\n");
+                        printf("[SYSTEM] RECOVERED 40 HP. CURRENT HP: %d/100\n", player1.hp);
+                    }
+                } else {
+                    printf("\nYou don't have any potions left!\n");
+                }
+            } else {
+                printf("\nYou can't use that item.\n");
+            }
+        }
+        // 10. Handle unrecognized commands
         else {
             printf("\n[SYSTEM ERROR] Command not recognized.\n");
-            printf("Available commands: 'look', 'search', 'open', 'go', 'stats', 'inventory', 'attack', 'quit'.\n");
+            printf("Available commands: 'look', 'search', 'open', 'go', 'stats', 'inventory', 'attack', 'use', 'quit'.\n");
         }
     }
 
