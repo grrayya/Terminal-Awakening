@@ -34,7 +34,16 @@ int main() {
 
     printf("========================================\n");
     printf("[SYSTEM] INITIALIZATION COMPLETE.\n");
-    printf("[SYSTEM] WELCOME, PLAYER.\n");
+    printf("[SYSTEM] WELCOME, USER.\n");
+    printf("========================================\n\n");
+
+    // Ask for the player's name
+    printf("[SYSTEM] ENTER PLAYER NAME:\n> ");
+    scanf("%49s", player1.name); 
+
+    printf("\n========================================\n");
+    printf("[SYSTEM] REGISTRATION COMPLETE.\n");
+    printf("[SYSTEM] GOOD LUCK, PLAYER: %s\n", player1.name);
     printf("========================================\n\n");
 
     printf("You wake up in a dark room. Your head is pounding.\n");
@@ -117,5 +126,67 @@ int main() {
             printf("Level: %d\n", player1.level);
             printf("-------------------\n");
         }
-        // 6. Move between rooms
+        // 6. Check inventory
+        else if (strcmp(command, "inventory") == 0 || strcmp(command, "items") == 0) {
+            printf("\n--- %s's INVENTORY ---\n", player1.name);
+            if (player1.has_keycard == 1) {
+                printf("[ ] SECURITY KEYCARD\n");
+            } else {
+                printf("(Your inventory is empty)\n");
+            }
+            printf("-----------------------\n");
+        }
+        // 7. Move between rooms
         else if (strcmp(command, "go") == 0) {
+            printf("\nWhere do you want to go?\n> ");
+            scanf("%49s", command);
+
+            if (strcmp(command, "north") == 0 || strcmp(command, "hallway") == 0) {
+                if (door_locked == 0 && current_room == 0) {
+                    printf("\nYou step through the steel doors into the dark hallway.\n");
+                    printf("The air here is freezing cold.\n");
+                    current_room = 1; 
+                } else if (door_locked == 1) {
+                    printf("\nThe heavy steel door blocks your path.\n");
+                } else {
+                    printf("\nYou are already in the hallway.\n");
+                }
+            } else {
+                printf("\nYou can't go that way.\n");
+            }
+        }
+        // 8. Check for attack
+        else if (strcmp(command, "attack") == 0) {
+            if (current_room == 1 && shadow.hp > 0) {
+                printf("\nYou lunge forward and strike the %s!\n", shadow.name);
+                shadow.hp -= 15; // Deal 15 damage
+                
+                if (shadow.hp <= 0) {
+                    printf("\n[SYSTEM] %s DEFEATED.\n", shadow.name);
+                    printf("[SYSTEM] YOU HAVE LEVELED UP.\n");
+                    player1.level += 1;
+                    player1.hp = 100; // Complete heal on level up
+                } else {
+                    printf("The %s has %d HP remaining.\n", shadow.name, shadow.hp);
+                    printf("It lashes out, dealing %d damage to you!\n", shadow.damage);
+                    player1.hp -= shadow.damage; 
+                    
+                    if (player1.hp <= 0) {
+                        printf("\n[SYSTEM] CRITICAL ERROR: PLAYER HP IS 0.\n");
+                        printf("[SYSTEM] GAME OVER.\n");
+                        playing = 0; 
+                    }
+                }
+            } else {
+                printf("\nThere is nothing to attack here.\n");
+            }
+        }
+        // 9. Handle unrecognized commands
+        else {
+            printf("\n[SYSTEM ERROR] Command not recognized.\n");
+            printf("Available commands: 'look', 'search', 'open', 'go', 'stats', 'inventory', 'attack', 'quit'.\n");
+        }
+    }
+
+    return 0;
+}
