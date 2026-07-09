@@ -2,218 +2,181 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Define the Player struct
+// Game entities
 typedef struct {
     char name[50];
     int hp;
-    int level;
-    int has_keycard; // 1 means they have it, 0 means they don't
-    int potions;     // Track number of healing potions
-} Player;
+    int lvl;
+    int key;  // 1 = has keycard
+    int pots; // Healing potions
+} Plyr;
 
-// Define the Enemy struct
 typedef struct {
     char name[50];
     int hp;
-    int damage;
-} Enemy;
+    int dmg;
+} Mob;
 
-// Initialize player with default stats
-Player init_player() {
-    Player p;
+Plyr init_plyr() {
+    Plyr p;
     strcpy(p.name, "Unknown");
     p.hp = 100;
-    p.level = 1;
-    p.has_keycard = 0; // Player starts with no keycard
-    p.potions = 1;     // Start with 1 health potion
+    p.lvl = 1;
+    p.key = 0;
+    p.pots = 1; 
     return p;
 }
 
 int main() {
-    // Initialize the player and enemy entities
-    Player player1 = init_player();
-    Enemy shadow = {"Shadow Beast", 30, 5};
+    Plyr p = init_plyr();
+    Mob mob = {"Shadow Beast", 30, 5};
 
     printf("========================================\n");
-    printf("[SYSTEM] INITIALIZATION COMPLETE.\n");
-    printf("[SYSTEM] WELCOME, USER.\n");
+    printf("[SYSTEM] INIT COMPLETE. WELCOME.\n");
     printf("========================================\n\n");
 
-    // Ask for the player's name
-    printf("[SYSTEM] ENTER PLAYER NAME:\n> ");
-    scanf("%49s", player1.name); 
+    printf("[SYSTEM] ENTER NAME:\n> ");
+    scanf("%49s", p.name); 
 
     printf("\n========================================\n");
-    printf("[SYSTEM] REGISTRATION COMPLETE.\n");
-    printf("[SYSTEM] GOOD LUCK, PLAYER: %s\n", player1.name);
+    printf("[SYSTEM] REGISTRATION COMPLETE. LUCK, %s.\n", p.name);
     printf("========================================\n\n");
 
     printf("You wake up in a dark room. Your head is pounding.\n");
-    printf("A glowing blue interface hovers in the air in front of you.\n");
 
-    // The Game Engine State
-    int current_room = 0; // 0 = Starting Room, 1 = Hallway
-    int door_locked = 1;  // 1 means locked, 0 means unlocked
+    int room = 0;   // 0 = Start, 1 = Hallway, 2 = Exit
+    int locked = 1; 
     int playing = 1;
-    char command[50];     // Variable to store what the player types
+    char cmd[50];   
 
     while (playing) {
-        printf("\nWhat do you want to do?\n> ");
-        scanf("%49s", command); // Reads up to 49 characters
+        printf("\n> ");
+        scanf("%49s", cmd);
 
-        // 1. Check for quit
-        if (strcmp(command, "quit") == 0) {
+        if (strcmp(cmd, "quit") == 0) {
             printf("\n[SYSTEM] SHUTTING DOWN...\n");
             playing = 0; 
         }
-        // 2. Check for look (Contextual)
-        else if (strcmp(command, "look") == 0) {
-            if (current_room == 0) {
-                printf("\nThe room is made of cold, bare metal.\n");
-                if (door_locked == 1) {
-                    printf("There is a heavy steel door to the north.\n");
+        else if (strcmp(cmd, "look") == 0) {
+            if (room == 0) {
+                printf("\nCold, bare metal room.\n");
+                printf(locked ? "A heavy steel door is to the north.\n" : "The steel door is open.\n");
+            } else if (room == 1) {
+                printf("\nA freezing, dim hallway.\n");
+                if (mob.hp > 0) {
+                    printf("A terrifying %s blocks your path!\n", mob.name);
                 } else {
-                    printf("The steel door to the north is open.\n");
-                }
-            } else if (current_room == 1) {
-                printf("\nYou are in a freezing, dimly lit hallway.\n");
-                if (shadow.hp > 0) {
-                    printf("A terrifying %s blocks your path, eyes glowing in the dark!\n", shadow.name);
-                } else {
-                    printf("The remains of the %s fade into black smoke on the floor.\n", shadow.name);
+                    printf("The %s's ashes cover the floor.\n", mob.name);
+                    printf("A blast door glows with an EXIT sign ahead.\n");
                 }
             }
         }
-        // 3. Check for search (Contextual)
-        else if (strcmp(command, "search") == 0) {
-            if (current_room == 0) {
-                if (player1.has_keycard == 0) {
-                    printf("\nYou drop to your knees and feel along the cold floor.\n");
-                    printf("Your hand brushes against a small plastic rectangle.\n");
-                    printf("[SYSTEM] YOU FOUND: SECURITY KEYCARD.\n");
-                    player1.has_keycard = 1; 
-                } else {
-                    printf("\nYou search the starting room again but find nothing else.\n");
-                }
+        else if (strcmp(cmd, "search") == 0) {
+            if (room == 0 && p.key == 0) {
+                printf("\nYou find a plastic rectangle.\n[SYSTEM] ACQUIRED: KEYCARD.\n");
+                p.key = 1; 
             } else {
-                printf("\nYou search the area, but find nothing of use.\n");
+                printf("\nYou find nothing.\n");
             }
         }
-        // 4. Check for open
-        else if (strcmp(command, "open") == 0) {
-            printf("\nWhat do you want to open?\n> ");
-            scanf("%49s", command); 
+        else if (strcmp(cmd, "open") == 0) {
+            printf("Open what?\n> ");
+            scanf("%49s", cmd); 
 
-            if (strcmp(command, "door") == 0) {
-                if (door_locked == 1) {
-                    if (player1.has_keycard == 1) {
-                        printf("\nYou swipe the keycard. A green light flashes. *BEEP*\n");
-                        printf("The heavy steel door grinds open, revealing a dark hallway.\n");
-                        door_locked = 0; 
-                    } else {
-                        printf("\nYou push against the heavy steel door. It's locked tight.\n");
-                        printf("[SYSTEM] A KEYCARD IS REQUIRED.\n");
-                    }
+            if (strcmp(cmd, "door") == 0 && room == 0) {
+                if (locked && p.key) {
+                    printf("\n*BEEP* The steel door grinds open.\n");
+                    locked = 0; 
+                } else if (locked) {
+                    printf("\nLocked tight. [SYSTEM] KEYCARD REQUIRED.\n");
                 } else {
-                    printf("\nThe door is already open. A dark hallway waits ahead.\n");
+                    printf("\nAlready open.\n");
                 }
             } else {
                 printf("\nYou can't open that.\n");
             }
         }
-        // 5. Check stats
-        else if (strcmp(command, "stats") == 0) {
-            printf("\n--- %s's STATS ---\n", player1.name);
-            printf("HP: %d / 100\n", player1.hp);
-            printf("Level: %d\n", player1.level);
-            printf("-------------------\n");
+        else if (strcmp(cmd, "stats") == 0) {
+            printf("\n--- %s's STATS ---\nHP: %d/100 | LVL: %d\n-------------------\n", p.name, p.hp, p.lvl);
         }
-        // 6. Check inventory
-        else if (strcmp(command, "inventory") == 0 || strcmp(command, "items") == 0) {
-            printf("\n--- %s's INVENTORY ---\n", player1.name);
-            printf("[P] HEALING POTIONS: %d\n", player1.potions);
-            if (player1.has_keycard == 1) {
-                printf("[ ] SECURITY KEYCARD\n");
-            }
-            if (player1.potions == 0 && player1.has_keycard == 0) {
-                printf("(Your inventory is empty)\n");
-            }
-            printf("-----------------------\n");
+        else if (strcmp(cmd, "inv") == 0 || strcmp(cmd, "items") == 0) {
+            printf("\n--- INVENTORY ---\nPotions: %d\n", p.pots);
+            if (p.key) printf("Security Keycard\n");
+            printf("-----------------\n");
         }
-        // 7. Move between rooms
-        else if (strcmp(command, "go") == 0) {
-            printf("\nWhere do you want to go?\n> ");
-            scanf("%49s", command);
+        else if (strcmp(cmd, "go") == 0) {
+            printf("Go where?\n> ");
+            scanf("%49s", cmd);
 
-            if (strcmp(command, "north") == 0 || strcmp(command, "hallway") == 0) {
-                if (door_locked == 0 && current_room == 0) {
-                    printf("\nYou step through the steel doors into the dark hallway.\n");
-                    printf("The air here is freezing cold.\n");
-                    current_room = 1; 
-                } else if (door_locked == 1) {
-                    printf("\nThe heavy steel door blocks your path.\n");
-                } else {
-                    printf("\nYou are already in the hallway.\n");
+            if (strcmp(cmd, "north") == 0 || strcmp(cmd, "hallway") == 0 || strcmp(cmd, "forward") == 0) {
+                if (!locked && room == 0) {
+                    printf("\nYou step into the freezing hallway.\n");
+                    room = 1; 
+                } else if (room == 1) {
+                    if (mob.hp > 0) {
+                        printf("\nThe %s blocks you!\n", mob.name);
+                    } else {
+                        printf("\nYou push through the blast door...\n");
+                        room = 2; // Move to exit
+                    }
+                } else if (locked) {
+                    printf("\nThe door blocks your path.\n");
                 }
             } else {
                 printf("\nYou can't go that way.\n");
             }
+
+            // Victory Check
+            if (room == 2) {
+                printf("\n========================================\n");
+                printf("[SYSTEM] ESCAPED. MISSION ACCOMPLISHED.\n");
+                printf("[SYSTEM] CONGRATULATIONS, %s.\n", p.name);
+                printf("========================================\n\n");
+                playing = 0; 
+            }
         }
-        // 8. Check for attack
-        else if (strcmp(command, "attack") == 0) {
-            if (current_room == 1 && shadow.hp > 0) {
-                printf("\nYou lunge forward and strike the %s!\n", shadow.name);
-                shadow.hp -= 15; // Deal 15 damage
+        else if (strcmp(cmd, "attack") == 0) {
+            if (room == 1 && mob.hp > 0) {
+                printf("\nYou strike the %s!\n", mob.name);
+                mob.hp -= 15;
                 
-                if (shadow.hp <= 0) {
-                    printf("\n[SYSTEM] %s DEFEATED.\n", shadow.name);
-                    printf("[SYSTEM] YOU HAVE LEVELED UP.\n");
-                    player1.level += 1;
-                    player1.hp = 100; // Complete heal on level up
+                if (mob.hp <= 0) {
+                    printf("\n[SYSTEM] %s DEFEATED. LEVELED UP.\n", mob.name);
+                    p.lvl++;
+                    p.hp = 100;
                 } else {
-                    printf("The %s has %d HP remaining.\n", shadow.name, shadow.hp);
-                    printf("It lashes out, dealing %d damage to you!\n", shadow.damage);
-                    player1.hp -= shadow.damage; 
+                    p.hp -= mob.dmg; 
+                    printf("%s has %d HP left.\nIt hits you for %d dmg! (HP: %d/100)\n", mob.name, mob.hp, mob.dmg, p.hp);
                     
-                    if (player1.hp <= 0) {
-                        printf("\n[SYSTEM] CRITICAL ERROR: PLAYER HP IS 0.\n");
-                        printf("[SYSTEM] GAME OVER.\n");
+                    if (p.hp <= 0) {
+                        printf("\n[SYSTEM] CRITICAL ERROR: HP IS 0. GAME OVER.\n");
                         playing = 0; 
                     }
                 }
             } else {
-                printf("\nThere is nothing to attack here.\n");
+                printf("\nNothing to attack.\n");
             }
         }
-        // 9. Check for item usage
-        else if (strcmp(command, "use") == 0) {
-            printf("\nWhat do you want to use?\n> ");
-            scanf("%49s", command);
+        else if (strcmp(cmd, "use") == 0) {
+            printf("Use what?\n> ");
+            scanf("%49s", cmd);
 
-            if (strcmp(command, "potion") == 0) {
-                if (player1.potions > 0) {
-                    if (player1.hp >= 100) {
-                        printf("\nYour health is already full!\n");
-                    } else {
-                        player1.hp += 40;
-                        if (player1.hp > 100) {
-                            player1.hp = 100; // Cap health at max
-                        }
-                        player1.potions--; // Use up the potion
-                        printf("\nYou drink the glowing red liquid. You feel a surge of energy!\n");
-                        printf("[SYSTEM] RECOVERED 40 HP. CURRENT HP: %d/100\n", player1.hp);
-                    }
+            if (strcmp(cmd, "potion") == 0) {
+                if (p.pots > 0 && p.hp < 100) {
+                    p.hp = (p.hp + 40 > 100) ? 100 : p.hp + 40;
+                    p.pots--;
+                    printf("\nHealed! HP: %d/100. Potions left: %d\n", p.hp, p.pots);
+                } else if (p.hp >= 100) {
+                    printf("\nHP is already full!\n");
                 } else {
-                    printf("\nYou don't have any potions left!\n");
+                    printf("\nNo potions left!\n");
                 }
             } else {
-                printf("\nYou can't use that item.\n");
+                printf("\nCan't use that.\n");
             }
         }
-        // 10. Handle unrecognized commands
         else {
-            printf("\n[SYSTEM ERROR] Command not recognized.\n");
-            printf("Available commands: 'look', 'search', 'open', 'go', 'stats', 'inventory', 'attack', 'use', 'quit'.\n");
+            printf("\nTry: look, search, open, go, stats, inv, attack, use, quit.\n");
         }
     }
 
