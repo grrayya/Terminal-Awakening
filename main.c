@@ -38,16 +38,16 @@ int main() {
     Plyr p = init_plyr();
     Mob mob = {"Shadow Beast", 30, 5};
 
-    printf("========================================\n");
+    printf(C_CYN "========================================\n");
     printf("[SYSTEM] INIT COMPLETE. WELCOME.\n");
-    printf("========================================\n\n");
+    printf("========================================\n\n" C_RST);
 
-    printf("[SYSTEM] ENTER NAME:\n> ");
+    printf(C_CYN "[SYSTEM] ENTER NAME:\n> " C_RST);
     scanf("%49s", p.name); 
 
-    printf("\n========================================\n");
+    printf(C_CYN "\n========================================\n");
     printf("[SYSTEM] REGISTRATION COMPLETE. LUCK, %s.\n", p.name);
-    printf("========================================\n\n");
+    printf("========================================\n\n" C_RST);
 
     printf("You wake up in a dark room. Your head is pounding.\n");
 
@@ -80,7 +80,7 @@ int main() {
         }
         else if (strcmp(cmd, "search") == 0) {
             if (room == 0 && p.key == 0) {
-                printf("\nYou find a plastic rectangle.\n[SYSTEM] ACQUIRED: KEYCARD.\n");
+                printf(C_CYN "\nYou find a plastic rectangle.\n[SYSTEM] ACQUIRED: KEYCARD.\n" C_RST);
                 p.key = 1; 
             } else {
                 printf("\nYou find nothing.\n");
@@ -92,10 +92,10 @@ int main() {
 
             if (strcmp(cmd, "door") == 0 && room == 0) {
                 if (locked && p.key) {
-                    printf("\n*BEEP* The steel door grinds open.\n");
+                    printf(C_GRN "\n*BEEP* The steel door grinds open.\n" C_RST);
                     locked = 0; 
                 } else if (locked) {
-                    printf("\nLocked tight. [SYSTEM] KEYCARD REQUIRED.\n");
+                    printf(C_RED "\nLocked tight. [SYSTEM] KEYCARD REQUIRED.\n" C_RST);
                 } else {
                     printf("\nAlready open.\n");
                 }
@@ -104,12 +104,12 @@ int main() {
             }
         }
         else if (strcmp(cmd, "stats") == 0) {
-            printf("\n--- %s's STATS ---\nHP: %d/100 | LVL: %d\n-------------------\n", p.name, p.hp, p.lvl);
+            printf(C_CYN "\n--- %s's STATS ---\nHP: %d/100 | LVL: %d\n-------------------\n" C_RST, p.name, p.hp, p.lvl);
         }
         else if (strcmp(cmd, "inv") == 0 || strcmp(cmd, "items") == 0) {
-            printf("\n--- INVENTORY ---\nPotions: %d\n", p.pots);
+            printf(C_CYN "\n--- INVENTORY ---\nPotions: %d\n", p.pots);
             if (p.key) printf("Security Keycard\n");
-            printf("-----------------\n");
+            printf("-----------------\n" C_RST);
         }
         else if (strcmp(cmd, "go") == 0) {
             printf("Go where?\n> ");
@@ -135,10 +135,10 @@ int main() {
 
             // Victory Check
             if (room == 2) {
-                printf("\n========================================\n");
+                printf(C_GRN "\n========================================\n");
                 printf("[SYSTEM] ESCAPED. MISSION ACCOMPLISHED.\n");
                 printf("[SYSTEM] CONGRATULATIONS, %s.\n", p.name);
-                printf("========================================\n\n");
+                printf("========================================\n\n" C_RST);
                 playing = 0; 
             }
         }
@@ -148,15 +148,16 @@ int main() {
                 mob.hp -= 15;
                 
                 if (mob.hp <= 0) {
-                    printf("\n[SYSTEM] %s DEFEATED. LEVELED UP.\n", mob.name);
+                    printf(C_YLW "\n[SYSTEM] %s DEFEATED. LEVELED UP.\n" C_RST, mob.name);
                     p.lvl++;
                     p.hp = 100;
                 } else {
                     p.hp -= mob.dmg; 
-                    printf("%s has %d HP left.\nIt hits you for %d dmg! (HP: %d/100)\n", mob.name, mob.hp, mob.dmg, p.hp);
+                    printf("%s has %d HP left.\n", mob.name, mob.hp);
+                    printf(C_RED "It hits you for %d dmg! (HP: %d/100)\n" C_RST, mob.dmg, p.hp);
                     
                     if (p.hp <= 0) {
-                        printf("\n[SYSTEM] CRITICAL ERROR: HP IS 0. GAME OVER.\n");
+                        printf(C_RED "\n[SYSTEM] CRITICAL ERROR: HP IS 0. GAME OVER.\n" C_RST);
                         playing = 0; 
                     }
                 }
@@ -172,7 +173,7 @@ int main() {
                 if (p.pots > 0 && p.hp < 100) {
                     p.hp = (p.hp + 40 > 100) ? 100 : p.hp + 40;
                     p.pots--;
-                    printf("\nHealed! HP: %d/100. Potions left: %d\n", p.hp, p.pots);
+                    printf(C_GRN "\nHealed! HP: %d/100. Potions left: %d\n" C_RST, p.hp, p.pots);
                 } else if (p.hp >= 100) {
                     printf("\nHP is already full!\n");
                 } else {
