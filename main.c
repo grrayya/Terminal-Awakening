@@ -2,6 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+// ANSI Color Codes
+#define C_RST  "\x1b[0m"
+#define C_CYN  "\x1b[36m"
+#define C_RED  "\x1b[31m"
+#define C_GRN  "\x1b[32m"
+#define C_YLW  "\x1b[33m"
+
 // Game entities
 typedef struct {
     char name[50];
